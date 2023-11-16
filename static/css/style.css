@@ -1,0 +1,11 @@
+    #flash-container {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: unset;
+        z-index: 9999;
+    }
+
+
+
+

@@ -1,0 +1,217 @@
+{% extends 'bootstrap/base.html' %}
+{% block content %}
+
+<div id="flash-container" class="position-fixed top-0 end-0 p-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{{ url_for('account', username=username) }}">Moje Konto</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('settings', username=username) }}">Ustawienia</a>
+            </li>
+            <!-- dodawnie zakładek -->
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a href="/logout" class="btn btn-danger">Wyloguj</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+<div class="row">
+    <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+        <h2 class="h3 mb-4 mt-4 ">Settings</h2>
+        <h5> Here you can find your account informations and change them</h5>
+        <div class="my-4">
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <button class="nav-link" data-toggle="collapse" data-target="#profile" role="tab" aria-controls="profile" >Profile</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-toggle="collapse" data-target="#security" role="tab" aria-controls="security" >Security</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-toggle="collapse" data-target="#notifications" role="tab" aria-controls="notifications" >Notifications</button>
+                </li>
+            </ul>
+
+
+            <div class="collapse" id="profile">
+                <h5 class="mb-0 mt-5">Profile Settings</h5>
+            <p>There are your account information settings.</p>
+                <div class="container mt-4">
+                    <form method="post">
+                        <div class="form-group">
+                        <label for="username">Nazwa użytkownika</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ username }}" required>
+                         </div>
+                        <div class="form-group">
+                       <label for="email">Email</label>
+                       <input type="email" class="form-control" id="email" name="email" value="{{ email }}"  required>
+                            <div class="input-group-append">
+                            <button class="btn btn-secondary" type="button" id="change_email" data-toggle="modal" data-target="#confirmation_modal" >change Email</button>
+                            </div>
+
+                            <!-- tutaj czesc dotyczaca okienka z potwierdzeniem kodu-->
+                            <div class="modal" tabindex="-1" role="dialog" id="confirmation_modal">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Potwierdzenie kodu</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Wprowadź kod potwierdzający wysłany na Twój adres e-mail.</p>
+                                            <input type="text" class="form-control" id="confirmation_code" placeholder="Kod potwierdzający">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                                            <button type="button" class="btn btn-primary" id="confirm_code">Potwierdź</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--dodaj funkcjonalnosc obslugi maila-->
+
+                         </div>
+                        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                        </form>
+                </div>
+            </div>
+
+
+
+            <div class="collapse" id="security">
+            <h5 class="mb-0 mt-5">Security Settings</h5>
+            <p>Here you can find your security settings. We highly suggest you to use at least one option.</p>
+          <div class="container mt-4">
+                <form method="post">
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong class="mb-2">Enable Activity Logs</strong>
+                            <p class="text-muted mb-0">Shows you recent activity on your account - where have you been logged from</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="form-check-input" id="activitylog" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong class="mb-2">2FA Authentication</strong>
+                            <p class="text-muted mb-0">Enables your 2FA authentication - your secret code used to authenticating.</p>
+                        </div>
+                        <div class="col-auto">
+                            <input type="checkbox" class="form-check-input" id="2_fa" >
+                        </div>
+                    </div>
+                </div>
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <strong class="mb-2">Activate Pin Code</strong>
+                            <p class="text-muted mb-0">Activates your pin authentication - logging via mail code.</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="form-check-input"  id="email_code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Zapisz zmiany</button>
+                </form>
+            </div>
+            </div>
+
+            <div class="collapse" id="notifications">
+                <h5 class="mb-0 mt-5">Notifications Settings</h5>
+            <p>Here you can find settings about your notification policy.</p>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    window.setTimeout(function() {
+        $(".alert").fadeTo(500, 0);
+    }, 3000);
+
+    jQuery('button.nav-link').click( function(e) {
+    jQuery('.collapse').collapse('hide');
+    });
+
+
+      $(document).ready(function() {
+      // sprawianie by mail byl nieedytowalny
+        $('#email').prop('readonly', true);
+
+
+        $('#change_email').on('click', function() {
+
+        // wlaczenie okienka
+        $('#confirmation-modal').modal('show');
+        });
+
+        $('#confirm_code').on('click', function() {
+
+            var confirmationCode = $('#confirmation_code').val();
+
+            $.ajax({
+                url: '/validate_code',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ confirmation_code: confirmationCode }),
+                success: function(response) {
+                    if (response.success) {
+                        $('#email').prop('readonly', false);
+                        $('#confirmation_modal').modal('hide');
+                    } else {
+                        alert('Nieprawidłowy kod potwierdzający.');
+                    }
+                },
+                 error: function() {
+                    alert('Wystąpił błąd podczas przetwarzania żądania.');
+                }
+            });
+        });
+    });
+</script>
+
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}

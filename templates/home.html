@@ -1,0 +1,33 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 text-center">
+        <h1>Witaj na Naszej Platformie</h1>
+        <p>Platforma oferuje bezpieczne logowanie oraz zarządzanie kontami.</p>
+        <a href="/login" class="btn btn-primary">Zaloguj</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sekcja z dodatkowymi informacjami o serwisie -->
+  <section class="bg-light py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h2>O Naszej Platformie</h2>
+          <p>Nasza platforma zapewnia najwyższy poziom bezpieczeństwa i wygody podczas zarządzania swoim kontem.</p>
+        </div>
+        <div class="col-md-6">
+          <h2>Dlaczego Wybrać Naszą Platformę?</h2>
+          <ul>
+            <li>Bezpieczne logowanie z dwuskładnikową autoryzacją (2FA).</li>
+            <li>Możliwość zarządzania danymi i ustawieniami konta.</li>
+            <li>Wsparcie dla wielu rodzajów autoryzacji 2FA, w tym kodów SMS i aplikacji autoryzacyjnych.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
