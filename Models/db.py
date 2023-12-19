@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import *
+import pyotp
 
 db = SQLAlchemy()
 
@@ -44,5 +45,5 @@ class Security(db.Model):
         self.user_id = user_id
         self.activity_log = activity_log
         self.two_fa = two_fa
-        self.two_fa_code = secrets.token_urlsafe(16)
+        self.two_fa_code = pyotp.TOTP(pyotp.random_base32()).secret
         self.email_code = email_code

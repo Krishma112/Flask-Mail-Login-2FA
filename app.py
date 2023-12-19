@@ -1,4 +1,4 @@
-import dbus
+# import dbus
 from flask import *
 from flask_bootstrap import Bootstrap
 from flask_login import *
@@ -352,10 +352,11 @@ def login_code(username):
         return jsonify({'status': 'error', 'message': 'Kod jest niepoprawny'})
 
 
-@app.route('/login_2fa/', methods=["POST"])
-def login_2fa(user):
+@app.route('/login_2fa/<username>', methods=["GET", "POST"])
+def login_2fa(username):
+    user = User.query.filter_by(username=username).first()
     if request.method == "POST":
-        secret = user.two_fa_code
+        secret = user.seucrity.two_fa_code
         otp = int(request.form.get("otp"))
 
         if pyotp.TOTP(secret).verify(otp):
@@ -369,7 +370,7 @@ def login_2fa(user):
             g.count += 1
             flash("You have supplied invalid 2FA token!", "danger")
             return redirect(url_for("login_2fa", user=user))
-    return render_template("login_2fa.html", secret=user.two_fa_code)
+    return render_template("login_2fa.html", secret=user.security.two_fa_code)
 
 
 # koniec logowania
