@@ -44,13 +44,13 @@
         <div class="my-4">
             <ul class="nav nav-tabs mb-4">
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#profile" role="tab" aria-controls="profile" >Profile</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#profile" role="tab" aria-controls="profile" id="Profile_nav" >Profile</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#security" role="tab" aria-controls="security" >Security</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#security" role="tab" aria-controls="security" id="security_nav">Security</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#notifications" role="tab" aria-controls="notifications" >Notifications</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#notifications" role="tab" aria-controls="notifications" id="notifications_nav">Notifications</button>
                 </li>
             </ul>
 
@@ -61,6 +61,7 @@
                 <div class="container mt-4">
                     <form method="post">
                         <div class="form-group">
+
                         <label for="username">Nazwa użytkownika</label>
                         <input type="text" class="form-control" id="username" name="username" value="{{ username }}" required>
                          </div>
@@ -107,6 +108,7 @@
             <p>Here you can find your security settings. We highly suggest you to use at least one option.</p>
           <div class="container mt-4">
                 <form method="post">
+
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col">
@@ -114,8 +116,10 @@
                             <p class="text-muted mb-0">Shows you recent activity on your account - where have you been logged from</p>
                         </div>
                         <div class="col-auto">
+                            <input type="hidden" name="activity_log_switch" id="activitylogswitch" {%if user.security and user.security.activity_log %}value="1"{% else %}value="0"{% endif %}>
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="form-check-input" id="activitylog" >
+                                <input class="custom-control-input" type="checkbox"  id="activity_log_checkbox" {%if user.security and user.security.activity_log %}checked{% endif %} >
+                                <label class="custom-control-label" for="activity_log_checkbox"></label>
                             </div>
                         </div>
                     </div>
@@ -127,7 +131,12 @@
                             <p class="text-muted mb-0">Enables your 2FA authentication - your secret code used to authenticating.</p>
                         </div>
                         <div class="col-auto">
-                            <input type="checkbox" class="form-check-input" id="2_fa" >
+                            <input type="hidden" name="2_fa_switch" id="2faswitch" {%if user.security and user.security.two_fa %}value="1"{% else %}value="0"{% endif %}>
+                            <div class="custom-control custom-switch">
+                                <input class="custom-control-input" type="checkbox" id="2_fa_checkbox" {%if user.security and user.security.two_fa %}checked{% endif %}>
+                            <label class="custom-control-label" for="2_fa_checkbox"></label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -138,8 +147,10 @@
                             <p class="text-muted mb-0">Activates your pin authentication - logging via mail code.</p>
                         </div>
                         <div class="col-auto">
+                            <input type="hidden" name="email_code_switch" id="emailcodeswitch" {%if user.security and user.security.email_code %}value="1"{% else %}value="0"{% endif %}>
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="form-check-input"  id="email_code">
+                                <input class="custom-control-input" type="checkbox"  id="email_code_checkbox" {%if user.security and user.security.email_code %}checked{% endif %}>
+                            <label class="custom-control-label" for="email_code_checkbox"></label>
                             </div>
                         </div>
                     </div>
@@ -167,6 +178,12 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    //javascript
+    //obsluga checkboxow
+
+
+
+
     window.setTimeout(function() {
         $(".alert").fadeTo(500, 0);
     }, 3000);
@@ -175,7 +192,7 @@
     jQuery('.collapse').collapse('hide');
     });
 
-
+     //obsluga zmiany maila
       $(document).ready(function() {
       // sprawianie by mail byl nieedytowalny
         $('#email').prop('readonly', true);
@@ -188,6 +205,12 @@
         });
 
         $('#confirm_code').on('click', function() {
+            $.ajax({
+                url:'/validate_code/send',
+                success: function(){
+                alert('wyslano kod z potwierdzeniem');
+                }
+                });
 
             var confirmationCode = $('#confirmation_code').val();
 
@@ -209,7 +232,34 @@
                 }
             });
         });
+
     });
+
+
+
+ document.addEventListener('DOMContentLoaded', function () {
+
+    var activity_log = document.getElementById('activity_log_checkbox');
+    var activitylogswitch = document.getElementById('activitylogswitch');
+
+    var two_fa = document.getElementById('2_fa_checkbox');
+    var twofaswitch = document.getElementById('2faswitch');
+
+    var email_code = document.getElementById('email_code_checkbox');
+    var emailcodeswitch = document.getElementById('emailcodeswitch');
+
+    activity_log.addEventListener('change', function () {
+        activitylogswitch.value = activity_log.checked ? '1' : '0';
+    });
+
+    two_fa.addEventListener('change', function () {
+        twofaswitch.value = two_fa.checked ? '1' : '0';
+    });
+
+    email_code.addEventListener('change', function () {
+        emailcodeswitch.value = email_code.checked ? '1' : '0';
+    });
+});
 </script>
 
 

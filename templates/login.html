@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <form method="POST">
+            <form id="login" action="/login" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" id="username" name="username" required>
@@ -37,8 +37,34 @@
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <!--<button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#confirmlogin">Login</button>-->
+                    <button type="submit" class="btn btn-primary" >Login</button>
                 </div>
+
+                            <!-- czesc odpowiedzialna za popup okienko z potwierdzeniem kodu-->
+                        <div class="modal fade" id="confirmlogin" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="ModalLabel">Wprowadź kod</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body" id="content">
+                                  <form id="code" action="/login/login_code" method="POST">
+                                <input type="text" class="form-control" id="confirmationCode" placeholder="Wprowadź kod">
+                                </form>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                                <button type="button" class="btn btn-primary" id="submit">Potwierdź</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+
             </form>
                 <div class="text-right mb-2">
                     <a href="/login/send_email_confirmation" class="btn btn-secondary btn-sm">confirm email</a>
@@ -53,10 +79,88 @@
     </div>
 </div>
 
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-window.setTimeout(function() {
+    window.setTimeout(function() {
     $(".alert").fadeTo(500, 0)
 }, 3000);
+/*
+var storedUsername;
+$(document).ready(function() {
+
+*/
+/*
+    $('#submit').click(function() {
+    var code = $('#confirmationCode').val();
+
+     $.post('/login/login_code', { code: code }, function(data) {
+    if (data.status === 'success'){
+        $('#login').submit();
+        } else {
+        alert('Error' + data.message);
+        }
+        });
+});*/
+/*
+     $('#login').submit(function (event) {
+            event.preventDefault();  // Zapobiegnij domyślnej akcji formularza
+
+            var login = {
+            username: $('#username').val(),
+            password: $('#password').val(),
+            code: $('#confirmationCode').val()
+            };
+*/
+/*
+            var code = {
+            code: $('#code').val()
+            };
+            var combined_data = { ...login, ...code};*/
+/*
+            // Wyślij dane do serwera przy użyciu AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/login/',
+                contentType: 'application/json',
+                data: JSON.stringify(login),
+                success: function (data) {
+
+                    if (data.status === 'success') {
+                        storedUsername = data.username
+                        $('#confirmlogin').modal('show');
+
+                        //$('#submit').click(function() {
+                            //var code = $(this).serialize();
+
+                            //$('#content').load();
+                            //$.post('/login/login_code/' + data.username, { code: login.code } , function(data) {
+                            //console.log(data.message)
+                            //$('#content').load('/login/login_code/' + data.username + '/' + code);
+                           //});
+                        //});
+                    } else {
+
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+
+        $('#submit').click(function() {
+            var confirmationCode = $('#confirmationCode').val();
+            $.post('/login/login_code/' + storedUsername, { code: confirmationCode }, function(data) {
+                window.location.href='/account/'+storedUsername;
+
+                //console.log(data);
+                //console.log(data.message);
+             });
+        });
+*/
+ //});
+
 </script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 

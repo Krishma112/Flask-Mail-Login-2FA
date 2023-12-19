@@ -36,6 +36,7 @@ class Security(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
     two_fa = db.Column(db.Boolean, default=False)
+    two_fa_code = db.Column(db.String(32), unique=True, nullable=False)
     activity_log = db.Column(db.Boolean, default=False)
     email_code = db.Column(db.Boolean, default=True)
 
@@ -43,4 +44,5 @@ class Security(db.Model):
         self.user_id = user_id
         self.activity_log = activity_log
         self.two_fa = two_fa
+        self.two_fa_code = secrets.token_urlsafe(16)
         self.email_code = email_code
