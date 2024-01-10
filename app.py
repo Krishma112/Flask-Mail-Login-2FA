@@ -1,5 +1,6 @@
 # import dbus
 from flask import *
+from flask import g
 from flask_bootstrap import Bootstrap
 from flask_login import *
 from flask_migrate import *
@@ -15,6 +16,7 @@ from Models.db import *
 
 # zmienna pomocnicza dla liczenia ilosci logowan
 # g.count = 0
+
 
 app = Flask(__name__, static_folder="static")
 
@@ -114,8 +116,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
 # inicjalizowanie bazy danych
 db.init_app(app)
-# with app.app_context():
-# db.create_all()
+#with app.app_context():
+    #db.drop_all()
+ #   db.create_all()
 migrate = Migrate(app, db)
 
 
@@ -355,21 +358,27 @@ def login_code(username):
 @app.route('/login_2fa/<username>', methods=["GET", "POST"])
 def login_2fa(username):
     user = User.query.filter_by(username=username).first()
+    g = user.security.login_session_count
     if request.method == "POST":
-        secret = user.seucrity.two_fa_code
+        secret = user.security.two_fa_code
         otp = int(request.form.get("otp"))
 
         if pyotp.TOTP(secret).verify(otp):
+            print('huj')
             login_user(user)
             flash("The TOTP 2FA token is valid", "success")
-            return redirect(url_for("account", user=user))
-        elif g.count == 3:
+            return redirect(url_for("account", username=current_user.username))
+        elif g == 2:
+            user.security.login_session_count = 0
+            db.session.commit()
             flash("You have supplied invalid 2FA token 3 times in a row, logged out", "danger")
             return redirect(url_for("login"))
         else:
-            g.count += 1
+            g += 1
+            user.security.login_session_count = g
+            db.session.commit()
             flash("You have supplied invalid 2FA token!", "danger")
-            return redirect(url_for("login_2fa", user=user))
+            return redirect(url_for("login_2fa", username=username))
     return render_template("login_2fa.html", secret=user.security.two_fa_code)
 
 
