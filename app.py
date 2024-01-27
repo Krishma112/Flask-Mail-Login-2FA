@@ -48,9 +48,9 @@ login_manager.init_app(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'pracainzynierska097@gmail.com'
-app.config['MAIL_PASSWORD'] = 'aeyk zrax fgvo fbgq'
-app.config['MAIL_DEFAULT_SENDER'] = 'pracainzynierska097@gmail.com'
+app.config['MAIL_USERNAME'] = 'pracainzynierska47@gmail.com'
+app.config['MAIL_PASSWORD'] = 'xcmr lqxt wpmq ncsp'
+app.config['MAIL_DEFAULT_SENDER'] = 'pracainzynierska47@gmail.com'
 
 mail = Mail(app)
 

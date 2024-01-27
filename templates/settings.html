@@ -199,9 +199,14 @@
 
 
         $('#change_email').on('click', function() {
-
+            $.ajax({
+                url:'/validate_code/send',
+                success: function(){
+                alert('wyslano kod z potwierdzeniem');
+                }
+                });
         // wlaczenie okienka
-        $('#confirmation-modal').modal('show');
+             $('#confirmation-modal').modal('show');
         });
 
         $('#confirm_code').on('click', function() {
