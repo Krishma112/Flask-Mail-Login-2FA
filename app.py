@@ -60,7 +60,6 @@ def send_confirmation_email(user):
 
     msg = Message('Potwierdzenie e-maila', recipients=[user.email])
     msg.body = f'Aby potwierdzić swój e-mail, kliknij w poniższy link:\n\n{confirmation_url}'
-    msg.html = f'Aby potwierdzić swój e-mail, kliknij w <a href="{confirmation_url}">ten link</a>.'
 
     mail.send(msg)
 
@@ -86,7 +85,6 @@ def send_confirmation_code(user):
     confirmation_code = secrets.token_urlsafe(10)
     user.login_code = confirmation_code
     db.session.commit()
-    print(confirmation_code)
 
     msg = Message('Confirmation code', recipients=[user.email])
     msg.body = f'Copy your confirmation code: \n{confirmation_code}'
@@ -364,7 +362,7 @@ def login_2fa(username):
         otp = int(request.form.get("otp"))
 
         if pyotp.TOTP(secret).verify(otp):
-            print('huj')
+
             login_user(user)
             flash("The TOTP 2FA token is valid", "success")
             return redirect(url_for("account", username=current_user.username))
@@ -412,7 +410,6 @@ def settings(username):
             db.session.commit()
 
         if request.method == "POST" and request.form.get("username") is not None and request.form.get("username") != "":
-            print("huj2")
             # zapisanie zmiennych z formularza
             new_username = request.form.get("username")
             # new_password = request.form["password"]
