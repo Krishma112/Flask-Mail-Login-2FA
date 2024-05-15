@@ -1,0 +1,59 @@
+{% extends 'bootstrap/base.html' %}
+{% block content %}
+<style>
+#qrcode{
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 180px;
+}
+</style>
+        <div class="col-lg-5 mx-auto my-4">
+      <form>
+        <div>
+          <h5>Instrukcje</h5>
+          <ul>
+            <li>pobierz <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US" target="_blank">Google Authenticator</a> na swoim urzadzeniu mobilnym.</li>
+            <li>CStworz nowe konto.</li>
+            <li>Dostarcz podane informacje - token.</li>
+            <li>Wybierz weryfikacje bazowana na czasie.</li>
+            <li>Dostarcz kod w formularzu podczas logowania.</li>
+            <li> Zapisz ten kod i nikomu go nie udostepniaj, jesli go utracisz mozesz utworzyc nowy resetujac ustawienia logowania.</li>
+          </ul>
+        </div>
+        <div class="form-group text-center">
+          <label for="secret">Token</label>
+            <div id="qrcode" ></div>
+          <input type="text" class="form-control" id="secret" value="{{ secret }}" readonly>
+        </div>
+        <div class="text-center">
+          <button type="button" class="btn btn-primary" onclick="copySecret()">Kopiowanie</button>
+        </div>
+      </form>
+    </div>
+
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+  function copySecret() {
+    var copyText = document.getElementById("secret");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Successfully copied TOTP secret token!");
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    generateQRCode();
+  });
+    function generateQRCode() {
+    var qrCodeElement = document.getElementById("qrcode");
+    var qr = new QRCode(qrCodeElement, {
+      text: "{{ secret }}",
+      width: 180,
+      height: 180,
+    });
+  }
+</script>
+{% endblock %}

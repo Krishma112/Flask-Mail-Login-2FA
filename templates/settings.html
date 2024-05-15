@@ -39,25 +39,25 @@
 <div class="container">
 <div class="row">
     <div class="col-12 col-lg-10 col-xl-8 mx-auto">
-        <h2 class="h3 mb-4 mt-4 ">Settings</h2>
-        <h5> Here you can find your account informations and change them</h5>
+        <h2 class="h3 mb-4 mt-4 ">Ustawienia</h2>
+        <h5> Tutaj mozesz znalezc swoje dane i je zmienic</h5>
         <div class="my-4">
             <ul class="nav nav-tabs mb-4">
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#profile" role="tab" aria-controls="profile" id="Profile_nav" >Profile</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#profile" role="tab" aria-controls="profile" id="Profile_nav" >Profil</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#security" role="tab" aria-controls="security" id="security_nav">Security</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#security" role="tab" aria-controls="security" id="security_nav">Zabezpieczenia</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" data-toggle="collapse" data-target="#notifications" role="tab" aria-controls="notifications" id="notifications_nav">Notifications</button>
+                    <button class="nav-link" data-toggle="collapse" data-target="#notifications" role="tab" aria-controls="notifications" id="notifications_nav">Powiadomienia</button>
                 </li>
             </ul>
 
 
             <div class="collapse" id="profile">
-                <h5 class="mb-0 mt-5">Profile Settings</h5>
-            <p>There are your account information settings.</p>
+                <h5 class="mb-0 mt-5">Ustawienia profilu</h5>
+            <p>Tutaj znajduja sie twoje dane.</p>
                 <div class="container mt-4">
                     <form method="post">
                         <div class="form-group">
@@ -69,7 +69,7 @@
                        <label for="email">Email</label>
                        <input type="email" class="form-control" id="email" name="email" value="{{ email }}"  required>
                             <div class="input-group-append">
-                            <button class="btn btn-secondary" type="button" id="change_email" data-toggle="modal" data-target="#confirmation_modal" >change Email</button>
+                            <button class="btn btn-secondary" type="button" id="change_email" data-toggle="modal" data-target="#confirmation_modal" >zmien Email</button>
                             </div>
 
                             <!-- tutaj czesc dotyczaca okienka z potwierdzeniem kodu-->
@@ -104,16 +104,16 @@
 
 
             <div class="collapse" id="security">
-            <h5 class="mb-0 mt-5">Security Settings</h5>
-            <p>Here you can find your security settings. We highly suggest you to use at least one option.</p>
+            <h5 class="mb-0 mt-5">Ustawienia zabezpieczen</h5>
+            <p>Tutaj mozesz znalezc swoje ustawienia zabezpieczen, zalecamy korzystanie z przynajmniej jednej opcji.</p>
           <div class="container mt-4">
                 <form method="post">
 
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col">
-                            <strong class="mb-2">Enable Activity Logs</strong>
-                            <p class="text-muted mb-0">Shows you recent activity on your account - where have you been logged from</p>
+                            <strong class="mb-2">Wlacz logi aktywnosci</strong>
+                            <p class="text-muted mb-0">Pokazuje ostatnia aktywnosc konta, oraz skad sie logowano</p>
                         </div>
                         <div class="col-auto">
                             <input type="hidden" name="activity_log_switch" id="activitylogswitch" {%if user.security and user.security.activity_log %}value="1"{% else %}value="0"{% endif %}>
@@ -127,14 +127,14 @@
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col">
-                            <strong class="mb-2">2FA Authentication</strong>
-                            <p class="text-muted mb-0">Enables your 2FA authentication - your secret code used to authenticating.</p>
+                            <strong class="mb-2">Google authenticator</strong>
+                            <p class="text-muted mb-0">Wlaczenie zabezpieczen za pomoca aplikacji.</p>
                         </div>
                         <div class="col-auto">
-                            <input type="hidden" name="2_fa_switch" id="2faswitch" {%if user.security and user.security.two_fa %}value="1"{% else %}value="0"{% endif %}>
+                            <input type="hidden" name="2_fa_switch" id="twofaswitch" {%if user.security and user.security.two_fa %}value="1"{% else %}value="0"{% endif %}>
                             <div class="custom-control custom-switch">
-                                <input class="custom-control-input" type="checkbox" id="2_fa_checkbox" {%if user.security and user.security.two_fa %}checked{% endif %}>
-                            <label class="custom-control-label" for="2_fa_checkbox"></label>
+                                <input class="custom-control-input" type="checkbox" id="two_fa_checkbox" {%if user.security and user.security.two_fa %}checked{% endif %}>
+                            <label class="custom-control-label" for="two_fa_checkbox"></label>
                             </div>
 
                         </div>
@@ -143,8 +143,8 @@
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col">
-                            <strong class="mb-2">Activate Pin Code</strong>
-                            <p class="text-muted mb-0">Activates your pin authentication - logging via mail code.</p>
+                            <strong class="mb-2">Kod email</strong>
+                            <p class="text-muted mb-0">Wlacza zabezpieczenie logowania poprzez adres email.</p>
                         </div>
                         <div class="col-auto">
                             <input type="hidden" name="email_code_switch" id="emailcodeswitch" {%if user.security and user.security.email_code %}value="1"{% else %}value="0"{% endif %}>
@@ -155,7 +155,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Zapisz zmiany</button>
+                <button type="submit" class="btn btn-primary mt-3" {%if user.security and user.security.two_fa == False %}onclick="if(document.getElementById('two_fa_checkbox').checked) POTPWindow()"{% endif %} >Zapisz zmiany</button>
                 </form>
             </div>
             </div>
@@ -170,6 +170,8 @@
     </div>
 </div>
 </div>
+
+
 
 
 
@@ -210,12 +212,6 @@
         });
 
         $('#confirm_code').on('click', function() {
-            $.ajax({
-                url:'/validate_code/send',
-                success: function(){
-                alert('wyslano kod z potwierdzeniem');
-                }
-                });
 
             var confirmationCode = $('#confirmation_code').val();
 
@@ -247,11 +243,13 @@
     var activity_log = document.getElementById('activity_log_checkbox');
     var activitylogswitch = document.getElementById('activitylogswitch');
 
-    var two_fa = document.getElementById('2_fa_checkbox');
-    var twofaswitch = document.getElementById('2faswitch');
+    var two_fa = document.getElementById('two_fa_checkbox');
+    var twofaswitch = document.getElementById('twofaswitch');
 
     var email_code = document.getElementById('email_code_checkbox');
     var emailcodeswitch = document.getElementById('emailcodeswitch');
+
+
 
     activity_log.addEventListener('change', function () {
         activitylogswitch.value = activity_log.checked ? '1' : '0';
@@ -259,12 +257,30 @@
 
     two_fa.addEventListener('change', function () {
         twofaswitch.value = two_fa.checked ? '1' : '0';
+
     });
 
     email_code.addEventListener('change', function () {
         emailcodeswitch.value = email_code.checked ? '1' : '0';
     });
 });
+
+ // otwieranie okna z POTP
+ function POTPWindow() {
+
+    var Width = 600;
+    var Height = 500;
+    var leftPosition = (screen.width - Width) / 2;
+    var topPosition = (screen.height - Height) / 2;
+    var windowFeatures = 'width=' + Width + ',height=' + Height + ',left=' + leftPosition + ',top=' + topPosition;
+
+    var formURL = '/POTP_code';
+
+    window.open(formURL, '_blank', windowFeatures);
+
+  }
+
+
 </script>
 
 
