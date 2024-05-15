@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from werkzeug.security import *
+# from werkzeug.security import *
+import secrets
+import bcrypt
 import pyotp
 
 db = SQLAlchemy()
@@ -14,11 +16,10 @@ class User(db.Model, UserMixin):
     confirmation_code = db.Column(db.String(100), unique=True, nullable=True)
     email_confirmed = db.Column(db.Boolean, default=False)
     login_code = db.Column(db.String(100), nullable=True)
+    new_email = db.Column(db.String(100), nullable=True)
 
     # relacja one to one
     security = db.relationship('Security', backref='user', uselist=False, cascade='all, delete-orphan')
-
-    # dodaj baze dla activity log
 
     def __init__(self, username, email, password):
         self.username = username
@@ -27,10 +28,13 @@ class User(db.Model, UserMixin):
         self.confirmation_code = secrets.token_urlsafe(32)
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        salt = bcrypt.gensalt()
+        self.password = bcrypt.hashpw(password.encode('utf-8'), salt)
+        # self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password)
+        # return check_password_hash(self.password, password)
 
 
 class Security(db.Model):
