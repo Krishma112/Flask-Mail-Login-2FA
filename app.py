@@ -1,4 +1,4 @@
-# import dbus
+
 from flask import *
 from flask import g
 from flask_bootstrap import Bootstrap
@@ -48,9 +48,9 @@ login_manager.init_app(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = 'pracainzynierska47@gmail.com'
-app.config['MAIL_PASSWORD'] = 'xcmr lqxt wpmq ncsp'
-app.config['MAIL_DEFAULT_SENDER'] = 'pracainzynierska47@gmail.com'
+app.config['MAIL_USERNAME'] = ''
+app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_DEFAULT_SENDER'] = ''
 
 mail = Mail(app)
 
@@ -63,6 +63,14 @@ def send_confirmation_email(user):
 
     mail.send(msg)
 
+
+def send_confirmation_change_email(user):
+    confirmation_url = url_for('confirm_change_email', confirmation_code=user.confirmation_code, _external=True)
+
+    msg = Message('Potwierdzenie e-maila', recipients=[user.new_email])
+    msg.body = f'Aby potwierdzić swój e-mail, kliknij w poniższy link:\n\n{confirmation_url}'
+
+    mail.send(msg)
 
 
 def send_password_reset_email(user):
@@ -140,6 +148,22 @@ def confirm_email(confirmation_code):
         return redirect(url_for('login'))
 
 
+@app.route('/confirm_change_email/<confirmation_code>')
+def confirm_change_email(confirmation_code):
+    user = User.query.filter_by(confirmation_code=confirmation_code).first()
+    if user:
+        user.email_confirmed = True
+        user.confirmation_code = None
+        user.email = user.new_email
+        user.new_email = None
+        db.session.commit()
+        flash('Twój adres e-mail został potwierdzony.', 'success')
+        return redirect(url_for('login'))
+    else:
+        flash('Nieprawidłowy kod potwierdzający.', 'danger')
+        return redirect(url_for('login'))
+
+
 @app.route('/password_redirect/<login_code>')
 def password_redirect(login_code):
     user = User.query.filter_by(login_code=login_code).first()
@@ -207,7 +231,8 @@ def reset_password(user_id):
         password = request.form.get("password")
         cpassword = request.form.get("cpassword")
         if password == cpassword:
-            user.password = generate_password_hash(password)
+            salt = bcrypt.gensalt()
+            user.password = bcrypt.hashpw(password.encode('utf-8'), salt)
             db.session.commit()
 
             send_password_reset_notification(user)
@@ -254,7 +279,7 @@ def signup():
     return render_template("signup.html")
 
 
-# koniec zarzadzania danymi
+# koniec zarzadzania danymi d
 
 
 # czesc dotyczaca logowania
@@ -277,25 +302,21 @@ def login_form():
         # wyszukanie uzytkownika w bazie
         user = User.query.filter_by(username=username).first()
         if user is None:
-            print("bad login")
             flash("invalid login credentials", "danger")
             return redirect(url_for("login"))
 
         # sprawdzenie, czy e-mail użytkownika został potwierdzony
         if not user.email_confirmed:
-            print("confirm email")
-            flash("Please confirm your email before logging in", "warning")
+            flash("Potwierdz swoj adres email przed logowaniem", "warning")
             return redirect(url_for("login"))
 
         # authentykacja
         if user and user.check_password(password) and user.security and user.security.two_fa :
-            print("login two_fa")
             g.count = 0
             flash("The credentials are valid", "success")
             return redirect(url_for("login_2fa", username=username))
         if user and user.check_password(password) and user.security and user.security.email_code:
         # if user and user.check_password(password):
-            print("login mail")
             g.count = 0
             # session['login_in_progress'] = True
             # informacja czy creds are valid
@@ -308,12 +329,10 @@ def login_form():
             flash("The credentials are valid please enter your confirmation code", "success")
             return redirect(url_for("login_confirm_email_page", username=username))
         elif user and user.check_password(password) and user.security and user.security.email_code is not True:
-            print("login bez maila")
             login_user(user)
             flash("The credentials are valid", "success")
             return redirect(url_for("account", username=username))
         else:
-            print("bad login")
             flash("invalid login credentials", "danger")
             return redirect(url_for("login"))
 
@@ -349,7 +368,6 @@ def login_code(username):
         flash("The credentials are valid", "success")
         return redirect(url_for("account", username=current_user.username))
     else:
-        print("failure")
         return jsonify({'status': 'error', 'message': 'Kod jest niepoprawny'})
 
 
@@ -431,12 +449,18 @@ def settings(username):
                 user.username = new_username
             # user.password = new_password
             if user.confirmation_code is None:
-                user.email = new_email
+                user.new_email = new_email
+                user.confirmation_code = secrets.token_urlsafe(32)
                 user.email_confirmed = False
+                db.session.commit()
+                send_confirmation_change_email(user)
 
             db.session.commit()
 
-            flash('Twoje ustawienia zostały zaktualizowane.', 'success')
+            if user.new_email == new_email:
+                flash('Wiadomosc zostala wyslana na nowy adres, w celu zmiany adresu email potwierdz go.')
+            else:
+                flash('Twoje ustawienia zostały zaktualizowane.', 'success')
 
         return render_template("settings.html", username=current_user.username,
                                email=current_user.email, user=current_user)
@@ -462,6 +486,13 @@ def change_email():
 def validate_code_send():
     settings_confirmation_code()
     return jsonify({"success": True, "message": "wyslano kod z potwierdzeniem"})
+
+
+@app.route('/POTP_code')
+def POTP_code():
+    current_user.security.two_fa_code = pyotp.TOTP(pyotp.random_base32()).secret
+    db.session.commit()
+    return render_template("POTP_code.html", secret=current_user.security.two_fa_code)
 
 
 @app.route('/logout')
